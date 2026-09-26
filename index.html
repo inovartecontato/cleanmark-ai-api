@@ -123,6 +123,18 @@
         <pre id="viewRaw" class="hidden text-xs leading-relaxed whitespace-pre-wrap text-emerald-300"></pre>
         <pre id="viewJson" class="hidden text-xs leading-relaxed whitespace-pre-wrap text-teal-300"></pre>
       </div>
+
+      <!-- Bookmarklet Bar -->
+      <div class="mt-4 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
+        <div class="flex items-center gap-2">
+          <span class="text-emerald-400 font-semibold">⚡ Power User Tool:</span>
+          <span>Drag this button to your bookmarks bar to convert any webpage in 1 click:</span>
+        </div>
+        <a href="javascript:(function(){window.open('https://cleanmark-ai-api.onrender.com/?url='+encodeURIComponent(location.href),'_blank');})();" 
+           class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-mono text-xs font-semibold border border-slate-700 cursor-grab active:cursor-grabbing transition flex items-center gap-1.5 shadow-sm">
+          <span>⚡ CleanMark Extractor</span>
+        </a>
+      </div>
     </div>
   </section>
 
@@ -328,6 +340,19 @@
       label.innerText = 'Copied!';
       setTimeout(() => label.innerText = 'Copy', 2000);
     }
+
+    // Auto-extract if ?url= is provided in query params
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const targetUrl = params.get('url');
+      if (targetUrl) {
+        const input = document.getElementById('urlInput');
+        if (input) {
+          input.value = targetUrl;
+          runExtract();
+        }
+      }
+    });
   </script>
 </body>
 </html>
