@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CleanMark AI — Turn Any Webpage into Clean Markdown for LLMs & RAG</title>
+  <meta name="description" content="High-performance Web-to-Markdown API. Strip ads, navbars, and boilerplate. Save up to 70% on LLM token costs for RAG pipelines and AI agents.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    pre, code { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <span class="font-extrabold text-xl tracking-tight text-white">CleanMark<span class="text-emerald-400">AI</span></span>
+        <span class="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800/60">v1.0 Live</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="#playground" class="text-sm font-medium text-slate-300 hover:text-white transition">Playground</a>
+        <a href="#pricing" class="text-sm font-medium text-slate-300 hover:text-white transition">Pricing</a>
+        <a href="https://rapidapi.com/inovartecontato/api/cleanmark-ai-web-to-markdown1" target="_blank" rel="noopener" class="text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold transition shadow-md shadow-emerald-500/20">Get API Key &rarr;</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="pt-16 pb-12 px-4 max-w-5xl mx-auto text-center">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-medium text-emerald-400 mb-6">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      Alternative to Firecrawl & Jina Reader at 80% Lower Cost
+    </div>
+    <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Turn Any Webpage into <span class="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">Clean Markdown</span> for LLMs & RAG
+    </h1>
+    <p class="text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed">
+      Strip advertisements, cookie popups, navigation headers, and HTML bloat. Feed your GPT-4, Claude, or Llama models pure, structured Markdown while saving up to <span class="text-emerald-400 font-semibold">70% on token embedding costs</span>.
+    </p>
+
+    <!-- Live Interactive Playground -->
+    <div id="playground" class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-6 text-left shadow-2xl backdrop-blur">
+      <div class="flex flex-col sm:flex-row gap-3 mb-4">
+        <div class="relative flex-1">
+          <input id="urlInput" type="url" placeholder="https://en.wikipedia.org/wiki/Artificial_intelligence" value="https://en.wikipedia.org/wiki/Artificial_intelligence" class="w-full h-12 bg-slate-950 border border-slate-700 rounded-xl px-4 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-mono">
+        </div>
+        <button id="extractBtn" onclick="runExtract()" class="h-12 px-6 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 whitespace-nowrap">
+          <span id="btnText">Convert to Markdown</span>
+          <svg id="btnSpinner" class="w-4 h-4 animate-spin hidden" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+        </button>
+      </div>
+
+      <!-- Metrics Bar -->
+      <div id="metricsBar" class="hidden grid-cols-2 sm:grid-cols-4 gap-3 p-3 bg-slate-950 rounded-xl border border-slate-800/80 mb-4 text-xs">
+        <div>
+          <span class="text-slate-400 block">Status:</span>
+          <span class="text-emerald-400 font-semibold" id="metricStatus">200 OK</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block">Words Extracted:</span>
+          <span class="text-white font-semibold font-mono" id="metricWords">0</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block">Estimated Tokens:</span>
+          <span class="text-white font-semibold font-mono" id="metricTokens">0</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block">Reading Time:</span>
+          <span class="text-emerald-400 font-semibold font-mono" id="metricTime">0 min</span>
+        </div>
+      </div>
+
+      <!-- Output Tabs -->
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+        <div class="flex gap-2">
+          <button id="tabPreview" onclick="setTab('preview')" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 text-white">Preview</button>
+          <button id="tabRaw" onclick="setTab('raw')" class="text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">Raw Markdown</button>
+          <button id="tabJson" onclick="setTab('json')" class="text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white">JSON</button>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="copyOutput()" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            <span id="copyLabel">Copy</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- View Containers -->
+      <div class="h-80 overflow-y-auto rounded-xl bg-slate-950 p-4 border border-slate-800 text-sm font-mono text-slate-300">
+        <div id="viewPreview" class="prose prose-invert prose-emerald max-w-none text-xs leading-relaxed whitespace-pre-wrap font-sans">
+          Click "Convert to Markdown" above to test the live extraction engine.
+        </div>
+        <pre id="viewRaw" class="hidden text-xs leading-relaxed whitespace-pre-wrap text-emerald-300"></pre>
+        <pre id="viewJson" class="hidden text-xs leading-relaxed whitespace-pre-wrap text-teal-300"></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Value Comparison Table -->
+  <section class="py-16 px-4 max-w-5xl mx-auto border-t border-slate-800/80">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-3">Why Developers Are Switching to CleanMark AI</h2>
+      <p class="text-slate-400 text-sm sm:text-base">High performance, zero bloat, and enterprise-ready reliability at a fraction of the cost.</p>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm border-collapse">
+        <thead>
+          <tr class="border-b border-slate-800 text-slate-400">
+            <th class="py-4 px-4 font-semibold">Feature</th>
+            <th class="py-4 px-4 font-semibold text-emerald-400 bg-emerald-950/20 rounded-t-lg">CleanMark AI</th>
+            <th class="py-4 px-4 font-semibold text-slate-300">Firecrawl</th>
+            <th class="py-4 px-4 font-semibold text-slate-300">Jina Reader</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800/60 text-slate-300">
+          <tr>
+            <td class="py-4 px-4 font-medium text-white">Monthly Starter Price</td>
+            <td class="py-4 px-4 font-bold text-emerald-400 bg-emerald-950/20">$9.99 / mo</td>
+            <td class="py-4 px-4 text-slate-400">$50.00 / mo</td>
+            <td class="py-4 px-4 text-slate-400">$20.00 / mo</td>
+          </tr>
+          <tr>
+            <td class="py-4 px-4 font-medium text-white">Free Requests Included</td>
+            <td class="py-4 px-4 font-bold text-emerald-400 bg-emerald-950/20">100 / month</td>
+            <td class="py-4 px-4 text-slate-400">500 total</td>
+            <td class="py-4 px-4 text-slate-400">Rate limited</td>
+          </tr>
+          <tr>
+            <td class="py-4 px-4 font-medium text-white">Token & Reading Time Metrics</td>
+            <td class="py-4 px-4 font-bold text-emerald-400 bg-emerald-950/20">&check; Built-in</td>
+            <td class="py-4 px-4 text-slate-500">&cross; Extra config</td>
+            <td class="py-4 px-4 text-slate-500">&cross; Not included</td>
+          </tr>
+          <tr>
+            <td class="py-4 px-4 font-medium text-white">Integrated Email & Spam Validator</td>
+            <td class="py-4 px-4 font-bold text-emerald-400 bg-emerald-950/20">&check; Included in plan</td>
+            <td class="py-4 px-4 text-slate-500">&cross; Not available</td>
+            <td class="py-4 px-4 text-slate-500">&cross; Not available</td>
+          </tr>
+          <tr>
+            <td class="py-4 px-4 font-medium text-white">Global Marketplace Billing</td>
+            <td class="py-4 px-4 font-bold text-emerald-400 bg-emerald-950/20">RapidAPI Hub</td>
+            <td class="py-4 px-4 text-slate-400">Credit Card only</td>
+            <td class="py-4 px-4 text-slate-400">Custom billing</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Pricing Cards -->
+  <section id="pricing" class="py-16 px-4 max-w-5xl mx-auto border-t border-slate-800/80">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-extrabold text-white mb-3">Simple, Transparent Pricing</h2>
+      <p class="text-slate-400 text-sm">Cancel anytime. Instant API key generation via RapidAPI Hub.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+      <!-- Free Plan -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 sm:p-8 flex flex-col justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Basic Tier</span>
+          <h3 class="text-3xl font-extrabold text-white mt-2 mb-1">$0 <span class="text-sm font-normal text-slate-400">/ month</span></h3>
+          <p class="text-xs text-slate-400 mb-6">Perfect for testing, hobby projects, and quick prototypes.</p>
+          <ul class="space-y-3 text-sm text-slate-300 mb-8">
+            <li class="flex items-center gap-2">&check; 100 requests / month</li>
+            <li class="flex items-center gap-2">&check; Web-to-Markdown extraction</li>
+            <li class="flex items-center gap-2">&check; Email syntax & disposable check</li>
+            <li class="flex items-center gap-2">&check; Community support</li>
+          </ul>
+        </div>
+        <a href="https://rapidapi.com/inovartecontato/api/cleanmark-ai-web-to-markdown1" target="_blank" rel="noopener" class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-sm text-center transition">Start Free</a>
+      </div>
+
+      <!-- Pro Plan -->
+      <div class="bg-gradient-to-b from-emerald-950/40 to-slate-900 border-2 border-emerald-500 rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative shadow-xl shadow-emerald-500/10">
+        <div class="absolute -top-3.5 right-6 px-3 py-1 rounded-full bg-emerald-500 text-slate-950 font-extrabold text-xs uppercase tracking-wider">
+          Recommended
+        </div>
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Pro Developer</span>
+          <h3 class="text-3xl font-extrabold text-white mt-2 mb-1">$9.99 <span class="text-sm font-normal text-slate-400">/ month</span></h3>
+          <p class="text-xs text-slate-300 mb-6">For AI builders, production RAG pipelines, and scraping agents.</p>
+          <ul class="space-y-3 text-sm text-slate-200 mb-8">
+            <li class="flex items-center gap-2 font-medium"><span class="text-emerald-400 font-bold">&check;</span> 500,000 requests / month</li>
+            <li class="flex items-center gap-2 font-medium"><span class="text-emerald-400 font-bold">&check;</span> Full token & reading time metrics</li>
+            <li class="flex items-center gap-2 font-medium"><span class="text-emerald-400 font-bold">&check;</span> Deep DNS MX email validation</li>
+            <li class="flex items-center gap-2 font-medium"><span class="text-emerald-400 font-bold">&check;</span> High-concurrency rate limit</li>
+            <li class="flex items-center gap-2 font-medium"><span class="text-emerald-400 font-bold">&check;</span> 99.9% Uptime SLA</li>
+          </ul>
+        </div>
+        <a href="https://rapidapi.com/inovartecontato/api/cleanmark-ai-web-to-markdown1" target="_blank" rel="noopener" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm text-center transition shadow-lg shadow-emerald-500/20">Subscribe to Pro &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quickstart Code Section -->
+  <section class="py-16 px-4 max-w-4xl mx-auto border-t border-slate-800/80">
+    <div class="text-center mb-8">
+      <h2 class="text-2xl font-bold text-white mb-2">Integrate in 3 Lines of Code</h2>
+      <p class="text-slate-400 text-xs sm:text-sm">Works seamlessly with Python, LangChain, Node.js, and cURL.</p>
+    </div>
+
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-6 font-mono text-xs text-slate-300 overflow-x-auto">
+      <div class="text-slate-500 mb-2"># Python (Requests / LangChain)</div>
+      <div class="text-teal-400">import requests</div>
+      <div class="text-slate-200 mt-1">url = "https://cleanmark-ai-api.onrender.com/v1/extract"</div>
+      <div class="text-slate-200">payload = {"url": "https://example.com"}</div>
+      <div class="text-emerald-400 mt-1">res = requests.post(url, json=payload)</div>
+      <div class="text-emerald-300">print(res.json()["markdown"])</div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 py-8 px-4 text-center text-xs text-slate-500">
+    <p>&copy; 2026 CleanMark AI. Created by <a href="https://github.com/inovartecontato" class="text-slate-400 hover:text-white underline">inovartecontato</a>. Listed on <a href="https://rapidapi.com/inovartecontato/api/cleanmark-ai-web-to-markdown1" class="text-emerald-400 hover:underline">RapidAPI Hub</a>.</p>
+  </footer>
+
+  <script>
+    let currentData = null;
+
+    async function runExtract() {
+      const url = document.getElementById('urlInput').value.trim();
+      if (!url) return alert('Please enter a valid URL');
+
+      const btn = document.getElementById('extractBtn');
+      const btnText = document.getElementById('btnText');
+      const spinner = document.getElementById('btnSpinner');
+      const metricsBar = document.getElementById('metricsBar');
+
+      btnText.innerText = 'Extracting...';
+      spinner.classList.remove('hidden');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/v1/extract', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        const data = await res.json();
+        currentData = data;
+
+        if (data.success) {
+          document.getElementById('viewPreview').innerText = data.markdown;
+          document.getElementById('viewRaw').innerText = data.markdown;
+          document.getElementById('viewJson').innerText = JSON.stringify(data, null, 2);
+
+          document.getElementById('metricWords').innerText = data.metrics.word_count.toLocaleString();
+          document.getElementById('metricTokens').innerText = data.metrics.estimated_tokens.toLocaleString();
+          document.getElementById('metricTime').innerText = data.metrics.reading_time_minutes + ' min';
+          metricsBar.classList.remove('hidden');
+          metricsBar.classList.add('grid');
+        } else {
+          document.getElementById('viewPreview').innerText = 'Error: ' + (data.error || 'Failed to extract content');
+        }
+      } catch (err) {
+        document.getElementById('viewPreview').innerText = 'Error connecting to API: ' + err.message;
+      } finally {
+        btnText.innerText = 'Convert to Markdown';
+        spinner.classList.add('hidden');
+        btn.disabled = false;
+      }
+    }
+
+    function setTab(tab) {
+      const p = document.getElementById('viewPreview');
+      const r = document.getElementById('viewRaw');
+      const j = document.getElementById('viewJson');
+      const tp = document.getElementById('tabPreview');
+      const tr = document.getElementById('tabRaw');
+      const tj = document.getElementById('tabJson');
+
+      p.classList.add('hidden');
+      r.classList.add('hidden');
+      j.classList.add('hidden');
+      tp.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white';
+      tr.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white';
+      tj.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white';
+
+      if (tab === 'preview') {
+        p.classList.remove('hidden');
+        tp.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 text-white';
+      } else if (tab === 'raw') {
+        r.classList.remove('hidden');
+        tr.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 text-white';
+      } else if (tab === 'json') {
+        j.classList.remove('hidden');
+        tj.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 text-white';
+      }
+    }
+
+    function copyOutput() {
+      if (!currentData || !currentData.markdown) return;
+      navigator.clipboard.writeText(currentData.markdown);
+      const label = document.getElementById('copyLabel');
+      label.innerText = 'Copied!';
+      setTimeout(() => label.innerText = 'Copy', 2000);
+    }
+  </script>
+</body>
+</html>
