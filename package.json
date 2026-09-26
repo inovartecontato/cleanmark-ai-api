@@ -1,0 +1,21 @@
+{
+  "name": "cleanmark-ai-api",
+  "version": "1.0.0",
+  "description": "High-performance Web-to-Markdown and Data Extraction Microservice for LLMs and RAG",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "markdown",
+    "web-scraping",
+    "rag",
+    "llm",
+    "email-verification"
+  ],
+  "author": "inovartecontato",
+  "license": "MIT"
+}
