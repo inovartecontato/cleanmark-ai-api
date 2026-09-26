@@ -7,6 +7,8 @@
 const http = require('http');
 const dns = require('dns').promises;
 const url = require('url');
+const fs = require('fs');
+const path = require('path');
 
 const PORT = process.env.PORT || 3000;
 
@@ -194,15 +196,39 @@ const server = http.createServer(async (req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const pathname = parsedUrl.pathname;
 
-  if (req.method === 'GET' && (pathname === '/v1/health' || pathname === '/')) {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({
-      status: 'healthy',
-      service: 'CleanMark AI Web to Markdown API',
-      version: '1.0.0',
-      uptime_seconds: Math.floor(process.uptime())
-    }));
-    return;
+  if (req.method === 'GET') {
+    if (pathname === '/v1/health') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        status: 'healthy',
+        service: 'CleanMark AI Web to Markdown API',
+        version: '1.0.0',
+        uptime_seconds: Math.floor(process.uptime())
+      }));
+      return;
+    }
+
+    if (pathname === '/' || pathname === '/index.html') {
+      const accept = req.headers['accept'] || '';
+      if (!accept.includes('application/json')) {
+        const rootIndexPath = path.join(__dirname, 'index.html');
+        const publicIndexPath = path.join(__dirname, 'public', 'index.html');
+        const targetHtml = fs.existsSync(rootIndexPath) ? rootIndexPath : (fs.existsSync(publicIndexPath) ? publicIndexPath : null);
+        if (targetHtml) {
+          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+          fs.createReadStream(targetHtml).pipe(res);
+          return;
+        }
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        status: 'healthy',
+        service: 'CleanMark AI Web to Markdown API',
+        version: '1.0.0',
+        uptime_seconds: Math.floor(process.uptime())
+      }));
+      return;
+    }
   }
 
   if (req.method === 'POST') {
